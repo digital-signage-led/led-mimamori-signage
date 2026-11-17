@@ -1,6 +1,6 @@
 const DESIGN_W = 640;
 const DESIGN_H = 384;
-const REFRESH_MS = 15000;
+const REFRESH_MS = 60000;
 const SOURCE = "https://cloud16.biz/member/latestdata_signage";
 const NOTE = "時点のデータ（1分毎に自動更新）";
 
