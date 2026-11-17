@@ -67,11 +67,13 @@ const fields = {
 let hasData = false;
 
 function fit() {
-  const scale = Math.min(1, window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H);
+  const width = window.innerWidth || document.documentElement.clientWidth || DESIGN_W;
+  const height = window.innerHeight || document.documentElement.clientHeight || DESIGN_H;
+  const scale = Math.min(width / DESIGN_W, height / DESIGN_H);
   stage.style.left = "0px";
   stage.style.top = "0px";
   stage.style.transformOrigin = "0 0";
-  stage.style.transform = scale === 1 ? "none" : `scale(${scale})`;
+  stage.style.transform = `scale(${scale})`;
 }
 
 function directionDeg(name, compass) {
