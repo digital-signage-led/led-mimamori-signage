@@ -10,14 +10,10 @@ body {
   user-select: none;
 }
 
-body {
-  display: flex;
-  justify-content: center;
-}
-
 #stage {
-  position: relative;
-  flex: none;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 640px;
   height: 384px;
   box-sizing: border-box;

@@ -67,9 +67,13 @@ const fields = {
 let hasData = false;
 
 function fit() {
-  stage.style.left = "";
-  stage.style.top = "";
-  stage.style.transform = "";
+  const width = window.innerWidth || DESIGN_W;
+  const height = window.innerHeight || DESIGN_H;
+  const scale = Math.min(width / DESIGN_W, height / DESIGN_H);
+  const x = Math.round((width - DESIGN_W * scale) / 2);
+  const y = Math.round((height - DESIGN_H * scale) / 2);
+  stage.style.transformOrigin = "0 0";
+  stage.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
 }
 
 function directionDeg(name, compass) {
@@ -144,6 +148,7 @@ async function tick() {
 }
 
 fit();
+window.addEventListener("resize", fit);
 tick();
 setInterval(tick, REFRESH_MS);
 document.addEventListener("visibilitychange", () => {
