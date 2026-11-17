@@ -1,6 +1,6 @@
 const DESIGN_W = 640;
 const DESIGN_H = 384;
-const REFRESH_MS = 60000;
+const REFRESH_MS = 15000;
 const SOURCE = "https://cloud16.biz/member/latestdata_signage";
 const NOTE = "時点のデータ（1分毎に自動更新）";
 
@@ -67,6 +67,7 @@ const fields = {
 };
 
 let hasData = false;
+let ticking = false;
 
 function fit() {
   const width = window.innerWidth || DESIGN_W;
@@ -116,9 +117,10 @@ function render(data) {
 }
 
 function showError() {
+  if (hasData) return;
   header.classList.add("is-error");
-  note.textContent = hasData ? "直前のデータを表示中" : "データを取得できません";
-  if (!hasData) observedAt.textContent = "--";
+  note.textContent = "データを取得できません";
+  observedAt.textContent = "--";
 }
 
 async function loadApi() {
@@ -202,11 +204,23 @@ async function loadSnapshot() {
 }
 
 async function tick() {
+  if (ticking) return;
+  ticking = true;
   try {
+    if (!hasData) {
+      try {
+        render(await loadSnapshot());
+      } catch (error) {
+        // 保存データが無くても、続く取得を続ける
+      }
+    }
     const live = (await loadApi()) || (await loadLive());
-    render(live || await loadSnapshot());
+    if (live) render(live);
+    else if (!hasData) showError();
   } catch (error) {
     showError();
+  } finally {
+    ticking = false;
   }
 }
 
