@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=640, height=384, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="robots" content="noindex">
+  <title>最新データ（簡易）640×384 – みまもり伝書鳩</title>
+  <link rel="stylesheet" href="css/signage.css">
+</head>
+<body>
+  <div id="stage">
+    <header>
+      <div class="site">現場：<span id="site-name"></span></div>
+      <div class="stamp">
+        <strong id="observed-at">--</strong>
+        <span id="note">データを取得しています</span>
+      </div>
+      <div class="term" id="term-name">端末1</div>
+    </header>
+    <main class="board">
+      <section class="card wind wind-row avg">
+        <span class="label">平均風速</span>
+        <span class="value" id="avg-wind">--</span>
+        <span class="unit">m/sec</span>
+      </section>
+      <section class="card wind wind-row gust">
+        <span class="label">瞬間風速</span>
+        <span class="value" id="gust-wind">--</span>
+        <span class="unit">m/sec</span>
+      </section>
+      <section class="card wind compass">
+        <div class="compass-top">
+          <span class="label">風向</span>
+          <span class="value" id="direction">--</span>
+        </div>
+        <div class="rose-wrap">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="64" r="34" fill="#8fd4e0" stroke="#3ec6ef" stroke-width="3.5"/>
+            <text class="tick" x="60" y="20" text-anchor="middle">北</text>
+            <text class="tick" x="108" y="68" text-anchor="middle">東</text>
+            <text class="tick" x="60" y="114" text-anchor="middle">南</text>
+            <text class="tick" x="14" y="68" text-anchor="middle">西</text>
+            <path id="needle" class="needle is-hidden" d="M60 32 L73 80 L60 68 L47 80 Z"/>
+          </svg>
+        </div>
+      </section>
+      <section class="card hot metric temp">
+        <span class="label">温度</span>
+        <div class="metric-row">
+          <span class="value" id="temperature">--</span>
+          <span class="unit">℃</span>
+        </div>
+      </section>
+      <section class="card hot metric hum">
+        <span class="label">湿度</span>
+        <div class="metric-row">
+          <span class="value" id="humidity">--</span>
+          <span class="unit">％</span>
+        </div>
+      </section>
+      <section class="card hot metric wbgt">
+        <span class="label">暑さ指数(WBGT)</span>
+        <div class="metric-row">
+          <span class="value" id="wbgt">--</span>
+        </div>
+      </section>
+      <section class="card rain metric rain1">
+        <span class="label">１時間雨量</span>
+        <div class="metric-row">
+          <span class="value" id="rain1h">--</span>
+          <span class="unit">mm</span>
+        </div>
+      </section>
+      <section class="card rain metric rain24">
+        <span class="label">２４時間雨量</span>
+        <div class="metric-row">
+          <span class="value" id="rain24h">--</span>
+          <span class="unit">mm</span>
+        </div>
+      </section>
+      <section class="card rain metric rain0">
+        <span class="label">降り始め雨量</span>
+        <div class="metric-row">
+          <span class="value" id="rain-since">--</span>
+          <span class="unit">mm</span>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>
