@@ -1,6 +1,8 @@
 const DESIGN_W = 640;
 const DESIGN_H = 384;
 const REFRESH_MS = 60000;
+const SOURCE = "https://cloud16.biz/member/latestdata_signage";
+const NOTE = "時点のデータ（1分毎に自動更新）";
 
 const DIRS = {
   北: 0,
@@ -92,7 +94,7 @@ function render(data) {
   header.classList.remove("is-error");
   siteName.textContent = data.siteName || "";
   observedAt.textContent = data.observedAt || "--";
-  note.textContent = "時点のデータ（1分毎に自動更新）";
+  note.textContent = NOTE;
   termName.textContent = data.termName || `端末${termId}`;
   text("avgWind", data.avgWind);
   text("gustWind", data.gustWind);
@@ -130,6 +132,67 @@ async function loadApi() {
   return body.data;
 }
 
+function decodeText(value) {
+  return String(value)
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseSignage(html) {
+  const clean = String(html).replace(/<!--[\s\S]*?-->/g, "");
+  const observedAt = decodeText((clean.match(/font-size:\s*32px;">\s*([^<]+?)\s*</i) || [])[1] || "");
+  const siteName = decodeText((clean.match(/現場：\s*([^<]{0,40})/) || [])[1] || "");
+  const values = [...clean.matchAll(/<input\b[^>]*\bvalue="([^"]*)"/gi)].map((match) => decodeText(match[1]));
+  const terms = [...clean.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/gi)].map((match) => ({
+    id: decodeText((match[1].match(/\bvalue="([^"]*)"/i) || [])[1] || ""),
+    name: decodeText(match[2].replace(/<[^>]+>/g, "")),
+    selected: /\bselected\b/i.test(match[1])
+  }));
+  const compass = ((clean.match(/compass_([a-z0-9]+)\.jpe?g/i) || [])[1] || "").toLowerCase();
+  if (values.length < 9 || !observedAt) throw new Error("最新データの解析に失敗しました");
+  const selected = terms.find((term) => term.selected) || terms[0] || { id: "", name: "" };
+  return {
+    observedAt,
+    siteName: siteName === "：" ? "" : siteName,
+    termId: selected.id,
+    termName: selected.name,
+    avgWind: values[0],
+    direction: values[1],
+    gustWind: values[2],
+    temperature: values[3],
+    humidity: values[4],
+    wbgt: values[5],
+    rain1h: values[6],
+    rain24h: values[7],
+    rainSince: values[8],
+    compass
+  };
+}
+
+async function loadLive() {
+  const page = new URL(SOURCE);
+  page.searchParams.set("termId", termId);
+  page.searchParams.set("showtype", "1");
+  page.searchParams.set("__i", account);
+  const response = await fetch(`https://r.jina.ai/${page}`, {
+    cache: "no-store",
+    headers: {
+      Accept: "text/html",
+      "X-Return-Format": "html",
+      "X-No-Cache": "true"
+    }
+  });
+  if (!response.ok) return null;
+  const data = parseSignage(await response.text());
+  data.termId = data.termId || termId;
+  return data;
+}
+
 async function loadSnapshot() {
   const url = new URL("data/latest.json", document.baseURI);
   url.searchParams.set("t", String(Date.now()));
@@ -140,7 +203,7 @@ async function loadSnapshot() {
 
 async function tick() {
   try {
-    const live = await loadApi();
+    const live = (await loadApi()) || (await loadLive());
     render(live || await loadSnapshot());
   } catch (error) {
     showError();
